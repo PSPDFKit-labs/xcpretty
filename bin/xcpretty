@@ -83,6 +83,8 @@ reporters = report_classes.compact.each_with_index.map { |k, i| k.new(report_opt
 STDIN.each_line do |line|
   printer.pretty_print(line)
   reporters.each { |r| r.handle(line) }
+  break if line =~ /^\*\* TEST (SUCCEEDED|FAILED) \*\*/
+  break if line =~ /^Test Suite 'All tests' (passed|failed)/
 end
 
 printer.finish
