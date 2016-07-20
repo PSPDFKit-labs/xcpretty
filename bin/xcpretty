@@ -84,7 +84,6 @@ STDIN.each_line do |line|
   printer.pretty_print(line)
   reporters.each { |r| r.handle(line) }
   break if line =~ /^\*\* TEST (SUCCEEDED|FAILED) \*\*/
-  break if line =~ /^Test Suite 'All tests' (passed|failed)/
 end
 
 printer.finish
