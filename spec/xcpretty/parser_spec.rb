@@ -23,6 +23,11 @@ module XCPretty
       @parser.parse(SAMPLE_ANALYZE_SHALLOW)
     end
 
+    it "parses analyze for a C++ target" do
+      @formatter.should receive(:format_analyze).with("CCChip8DisplayView.cpp", "CocoaChip/CCChip8DisplayView.cpp")
+      @parser.parse(SAMPLE_ANALYZE_CPP)
+    end
+
     it "parses build target" do
       @formatter.should receive(:format_build_target).with("The Spacer", "Pods", "Debug")
       @parser.parse(SAMPLE_BUILD)
@@ -158,9 +163,24 @@ module XCPretty
       @parser.parse(SAMPLE_LD)
     end
 
+    it "parses Ld with relative path" do
+      @formatter.should receive(:format_linking).with('ObjectiveSugar', 'normal', 'i386')
+      @parser.parse(SAMPLE_LD_RELATIVE)
+    end
+
     it "parses Libtool" do
       @formatter.should receive(:format_libtool).with('libPods-ObjectiveSugarTests-Kiwi.a')
       @parser.parse(SAMPLE_LIBTOOL)
+    end
+
+    it "parses uitest failing tests" do
+      @formatter.should receive(:format_failing_test).with(
+        "viewUITests.vmtAboutWindow",
+        "testConnectToDesktop",
+        "UI Testing Failure - Unable to find hit point for element Button 0x608001165880: {{74.0, -54.0}, {44.0, 38.0}}, label: 'Disconnect'",
+        "<unknown>:0"
+      )
+      @parser.parse(SAMPLE_UITEST_CASE_WITH_FAILURE)
     end
 
     it "parses specta failing tests" do
@@ -476,6 +496,21 @@ module XCPretty
         @parser.parse("hohohoooo")
       end
 
+      it "parses provisioning profile doesn't support capability error" do
+        @formatter.should receive(:format_error)
+        @parser.parse(SAMPLE_PROFILE_DOESNT_SUPPORT_CAPABILITY_ERROR)
+      end
+
+      it "parses provisioning profile doesn't include entitlement error" do
+        @formatter.should receive(:format_error)
+        @parser.parse(SAMPLE_PROFILE_DOESNT_INCLUDE_ENTITLEMENT_ERROR)
+      end
+
+      it "parses code signing is required error" do
+        @formatter.should receive(:format_error)
+        @parser.parse(SAMPLE_CODE_SIGNING_IS_REQUIRED_ERROR)
+      end
+
       it 'parses generic errors' do
         @formatter.should receive(:format_error).with("Hi there. I'm a really nasty error. Can you fix me")
         @parser.parse("   error: Hi there. I'm a really nasty error. Can you fix me")
@@ -503,6 +538,11 @@ module XCPretty
       it "parses ld warnings" do
         @formatter.should receive(:format_ld_warning).with("ld: embedded dylibs/frameworks only run on iOS 8 or later")
         @parser.parse("ld: warning: embedded dylibs/frameworks only run on iOS 8 or later")
+      end
+
+      it "parses will not be code signed warnings" do
+        @formatter.should receive(:format_will_not_be_code_signed).with(SAMPLE_WILL_NOT_BE_CODE_SIGNED)
+        @parser.parse(SAMPLE_WILL_NOT_BE_CODE_SIGNED)
       end
     end
 
